@@ -1,0 +1,103 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Jura:wght@400;600;700&display=swap');
+:root{--bg:#080808;--panel:#121212;--line:#20202b;--line2:#2c2c3a;--ink:#f0f0f0;--sub:#a6a6c0;
+ --muted:#6a6a8a;--primary:#00c8ff;--display:"Jura",sans-serif;--mono:"JetBrains Mono",monospace;--body:"Inter",sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1280px;height:440px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);position:relative;overflow:hidden;
+ padding:30px 48px 24px;display:flex;flex-direction:column}
+.glow{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);width:560px;height:460px;border-radius:50%;
+ background:radial-gradient(circle,rgba(0,200,255,.13),transparent 62%);pointer-events:none}
+.grid{position:absolute;inset:0;opacity:.45;pointer-events:none;
+ background-image:linear-gradient(#0e1720 1px,transparent 1px),linear-gradient(90deg,#0e1720 1px,transparent 1px);
+ background-size:64px 64px;-webkit-mask-image:radial-gradient(120% 100% at 50% 0,#000,transparent 72%)}
+.top{display:flex;align-items:baseline;gap:16px;position:relative}
+.wordmark{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:-.02em}
+.wordmark .hi{color:var(--primary);text-shadow:0 0 34px rgba(0,200,255,.55)}
+.tag{font-family:var(--mono);font-size:13px;letter-spacing:2.6px;color:var(--primary);text-transform:uppercase}
+.lede{font-size:15.5px;color:var(--sub);margin-top:9px;position:relative}
+.lede b{color:var(--ink);font-weight:600}
+
+.diagram{flex:1;display:flex;align-items:center;justify-content:center;gap:20px;position:relative;margin-top:6px}
+.machine{border:1px solid var(--line2);border-radius:12px;background:rgba(18,18,18,.75);padding:12px 14px 13px;width:296px}
+.mlabel{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:9px}
+.sess{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12.5px;color:var(--ink);
+ background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 9px;margin-bottom:5px}
+.sess:last-child{margin-bottom:0}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 7px rgba(0,200,255,.8);flex:none}
+.dot.idle{background:var(--muted);box-shadow:none}
+.sess .st{margin-left:auto;color:var(--muted);font-size:10.5px}
+
+.mid{display:flex;flex-direction:column;align-items:center;gap:9px;width:236px}
+.board{font-family:var(--mono);font-weight:700;font-size:15px;color:#04121a;background:var(--primary);
+ border-radius:11px;padding:14px 20px;text-align:center;line-height:1.32;box-shadow:0 0 44px rgba(0,200,255,.5)}
+.board small{display:block;font-weight:500;font-size:10px;letter-spacing:1.4px;opacity:.72;margin-top:3px}
+.kinds{font-family:var(--mono);font-size:10.5px;color:var(--muted);text-align:center;line-height:1.65}
+.kinds b{color:var(--primary);font-weight:400}
+.phone{font-family:var(--mono);font-size:11px;color:var(--sub);border:1px dashed var(--line2);
+ border-radius:8px;padding:5px 11px;white-space:nowrap}
+.arrow{font-family:var(--mono);font-size:19px;color:var(--muted);flex:none}
+
+.hooks{display:flex;justify-content:center;gap:9px;margin-top:4px;position:relative}
+.hook{font-family:var(--mono);font-size:10.5px;color:var(--sub);background:var(--panel);
+ border:1px solid var(--line);border-radius:6px;padding:5px 10px}
+.hook b{color:var(--primary);font-weight:400}
+.foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px;position:relative}
+.brand{display:flex;align-items:center;gap:9px}
+.brand .mark{width:24px;height:24px;image-rendering:pixelated;filter:drop-shadow(0 0 7px rgba(0,200,255,.45))}
+.brand .nm{font-family:var(--display);font-weight:700;font-size:15px}
+.brand .who{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.rt{font-family:var(--mono);font-size:11px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase}
+.rt b{color:var(--primary);font-weight:400}
+</style></head>
+<body>
+<div class="glow"></div><div class="grid"></div>
+
+<div class="top">
+  <div class="wordmark">call<span class="hi">sheet</span></div>
+  <div class="tag">coordination for coding agents</div>
+</div>
+<div class="lede">Sessions that don't know about each other, made aware — <b>through a shared artifact, not a conversation.</b></div>
+
+<div class="diagram">
+  <div class="machine">
+    <div class="mlabel">your machine</div>
+    <div class="sess"><span class="dot"></span>myrepo-a1<span class="st">running a tool</span></div>
+    <div class="sess"><span class="dot idle"></span>myrepo-7c<span class="st">waiting on you</span></div>
+    <div class="sess"><span class="dot"></span>api-3f<span class="st">working</span></div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <div class="mid">
+    <div class="board">THE CALL SHEET<small>APPEND-ONLY LOG</small></div>
+    <div class="kinds"><b>handoff</b> · <b>claim</b> · <b>question</b><br>note · done · decision · ack</div>
+    <div class="phone">handoff · blocked → your phone</div>
+  </div>
+
+  <div class="arrow">←</div>
+
+  <div class="machine">
+    <div class="mlabel">their machine</div>
+    <div class="sess"><span class="dot idle"></span>myrepo-b2<span class="st">waiting on them</span></div>
+    <div class="sess"><span class="dot"></span>myrepo-9z<span class="st">working</span></div>
+    <div class="sess"><span class="dot"></span>infra-e4<span class="st">running a tool</span></div>
+  </div>
+</div>
+
+<div class="hooks">
+  <div class="hook"><b>session start</b> · who you are, who else is live</div>
+  <div class="hook"><b>prompt submit</b> · what landed since you looked</div>
+  <div class="hook"><b>pre-write</b> · someone claims this file</div>
+  <div class="hook"><b>turn end</b> · post what you just did</div>
+</div>
+
+<div class="foot">
+  <div class="brand">
+    <img class="mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD4AAABACAMAAAB1NzTHAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAADwUExURQAAAACp4gAzYgCo4AAPSQAYTQCr5ACp4ACp3gCz6wCr3ACm4ABDaACo3gCd1QCp3AC67QCSygCp7wCr3gCo3ACo2wCm3ACr4ACo1wCt3ACv7QCt5wCm3gCp1QBOcwAzZgCm2QCp2wAjSQCk2wCk3ACx1wCm1wCt2wCo5ACo2QCp2QCo5gCk4ACk4gCm4gCr1QCi4gCk1wCz3gCpygCr0wCv1QCm2wCk3gCv0QC48gCo0wC68ACg1QDB5wCi2wDD6wCd4gDB6wCe4ACr0ADB6QCx0wCt2QCr2wDD6QC86wC95wDD5wC67wCv8AC85v///9eeepoAAAABdFJOUwBA5thmAAAAAWJLR0RPbmZBSQAAAAd0SU1FB+oIHwQuMR7RP4YAAALBSURBVEjHvZbZdtQwDIY9BIjQEAQombIM0KEFCrSspZSltEDZl/d/HGzZWSaxHZ8zh9FFFitfbP2SF6V8NjnjacxUqp31NZ5Lpc/ncKHfhpDc+TS7OGwskvFVrbg0bKN0/PKVYdvVtQ1eKUYiAia5GqMymZ0w8tBSg/fCzFil0UFLqRwI4zgbpYl5Q5tc7cXdzY3HeCK8FnRWozhH80Or4bAOPOfrQwcl48Bwo9deiOqJOPLN/rCRq1R8TrcGDpky/1s6XFH56AfjZYMbYYPROXMbOWJ0ZwRXFUXwzTFaRSY8YgId5HGRRAd4mCfSKodlI3NZwx7XyWuhe1V3dZ2Zrm17saWCiy2ijBG0vlOZ23q5B60CuSUayPjR6AKDyp7ociEdXqV7LUmmV1d0UKWBt1UpazHe62mNOqub9ZtsJ0vlY358v3YvNM9dmj0j6mav55st7TgPpKOdfjwd/KHH1fCPzNtg/8siJdPF5zLJ8LG87GpbEOwt9Y4mE4TTvemTaRsYPpXnbTsXn9n0kTX9WDbRw3NllNcbGGMnrhcC2Gcrjs7Oy1Yh9yvab1Kiu9lqZKVXdeTMB+J3Clc5ve5J4d6pK+thmx8LQmZriN4MqjLPsz6uv3bV4aoaTALeeo8xgMWuvr1730lqWQvUoc0m78ELlOwfzdqakmr6oEXAuW0sg7RpNu3HKPHJ8elQBEY6ceOr9ffjslh9dPXySQ/gs0BNRY/0Ls7TutyKAr7Iw9ceHjiA1Xjzc1cO31p8ZmX1Ky+fHbc/3+9/UePswXfsqfJ78HBYcqz3wi62PyB4uIUDFVG+PtMGj8YuPARv7CzT7WdwtwFX+f7Ywcb0K3gyB1kSI7gR7TR8sHdFx/Db4/xjuaMw3iTOl5uJXbP+Mod2WjfhlL9s6tU0uE/VB6dA4sqYV1sZzTuN5b350P9zj/cf4JVPZLM5KZ8AAAAASUVORK5CYII=" alt="Alienrobot">
+    <span class="nm">Alienrobot</span><span class="who">· John Huikku</span>
+  </div>
+  <div class="rt">READ IS FREE · <b>ASKING COSTS A TURN</b> · MIT</div>
+</div>
+</body></html>
