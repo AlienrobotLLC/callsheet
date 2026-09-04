@@ -53,6 +53,21 @@ peer.
 half matters: pids get reused, and without the start-time check a dead session's record
 resurrects as whatever process inherited its number.
 
+**Names are mutable, and that is more dangerous than it sounds.** If your CLI lets a user rename
+a session, check what the rename actually writes. In ours it writes the *same field the registry
+reads* — so the tab label and the peer address are one field, not two. Renaming a tab therefore
+**re-addresses the session**: the old name stops existing, and every handoff, claim and message
+naming it silently stops matching.
+
+We documented the opposite first — advised prefixing tab labels as a cosmetic nicety — and found
+out by running it, when a session simply ceased to exist under the name its peers knew. Two
+consequences worth building in from the start:
+
+- **Resolve a session by its former names as well as its current one**, and always print the
+  *current* name back, so anything you hand the user to copy still works.
+- **Show each session its own name where it can't be missed** — a status line is ideal. Identity
+  that a user can change is identity a user needs to see.
+
 Cross-machine, identity is the triple **(owner, machine, name)** — names are per machine and
 per process, so they collide. Handoffs address the **owner**, never the session name: people
 persist, sessions don't.
@@ -126,6 +141,22 @@ The report worth assembling, in this order:
 4. **Collisions** — files more than one session has touched recently.
 5. **What landed** — the done, decided and acknowledged.
 
+**It can watch, not only answer.** The same reads that let it report on demand let it run as a
+daemon and tell you when something needs you — which is the only way one condition ever surfaces:
+**a session stuck on an unanswered permission prompt.** That looks identical to work in progress
+from the outside, no amount of waiting fixes it, and nothing else in the system catches it. Add
+unacknowledged handoffs going stale and you have the whole useful set.
+
+Two rules there, both learned by getting them wrong:
+
+- **One notification per cycle, however many conditions fired.** Five open items is one message
+  listing five, never five messages. Our first run sent five — precisely the burst this document
+  warns against elsewhere.
+- **Back off on repeats** (§8), or a genuine alert arrives in a channel the user has already muted.
+
+Scanning is free, so it can run often; only the notification crosses the network. Run it as a
+service rather than a terminal tab, and it survives the reboot that a tab does not.
+
 Two rules keep it useful:
 
 - **It must never message a peer for status.** That would cost the peer a full turn to report
@@ -197,6 +228,43 @@ behind event sourcing and shared-log systems.)
 **Why not a chat transcript:** because the useful queries are "what changed since I last
 looked", "who holds this file", and "what is unacknowledged" — all of which are trivial over
 typed rows and painful over prose.
+
+### Append-only means you cannot take it back
+
+The property that makes the board safe under concurrency (§4) has a price that only shows up the
+first time someone misroutes something: **nothing deletes.** There is no retract, no cancel, no
+unsend. Design for that rather than discovering it.
+
+The trap we hit twice in one session: **a reply addresses the entry's *author*, not its
+recipient.** That is the only sensible default — you are answering whoever wrote it — but it
+means replying to *your own* misrouted entry to correct it addresses the correction back to
+yourself. The recipient sees nothing, and their copy stays open. The flag reads like "reply to
+this thread"; it means "reply to the author".
+
+So retracting is posting a correction that actually reaches the person, and two details are easy
+to miss:
+
+- **A note does not close a handoff.** It keeps surfacing, and a reminder daemon keeps nagging
+  about it. If no action is needed, say "no ack needed" explicitly — or better, have the sender
+  be able to close it.
+- **If the misrouted entry contained something useful, leave that part standing.** Retracting
+  wholesale throws away the work along with the mistake.
+
+### Address a person, or a specific session — but be able to say which
+
+Handoffs address a **person** (§7), because people persist and sessions don't. That is right, and
+it is not sufficient. A session frequently needs to hand work to a *sibling session* — the tab
+already doing the backend work, the one that owns that migration.
+
+If the only thing a session can name is a person, it will name the other person, because that is
+the only other name it has. We watched exactly that: a session wrote a detailed spec for its
+*own* team's other tab and addressed it to the other developer, whose queue it did not belong in.
+The agent was not confused about who should do the work; it had no way to say so.
+
+Accept both. Resolve a session name to its owner, carry the session name alongside, and have the
+receiving side sort a session-addressed entry to the top for that tab while telling the *others*
+it is addressed elsewhere. Reject an unknown target and list the valid people and live sessions —
+never silently deliver it to a person because the name did not parse.
 
 ## 5. The hook lifecycle
 
@@ -337,6 +405,25 @@ people mute the channel within a day and the whole mechanism is dead.
 Include enough in the message to decide without opening anything: who it's from, which repo and
 branch, the text, and the id to acknowledge. And treat it as public — it goes to a third-party
 service, so no secrets, credentials, or customer data.
+
+### Reminders: back off, or get muted
+
+Deciding *what* earns a notification is only half of it. The other half is what happens when the
+thing stays true, and getting this wrong is how a channel dies quietly.
+
+Our first version reminded on a flat 30-minute cooldown for as long as a condition remained open.
+That is fine for something resolved in an hour. Applied to five handoffs that stayed open between
+13 hours and 2.6 days, it sent the same five-item message every half hour — roughly **125
+reminders for the oldest item**. Nobody reads the 125th. They mute the channel, and then it costs
+you the urgent ones too.
+
+**Each reminder should wait twice as long as the last, capped at about a day.** Reminders land at
+0.5h, 1.5h, 3.5h, 7.5h, 15.5h, then roughly daily: **seven pings over 2.6 days instead of 125**,
+and a genuinely stale item still stays alive rather than being forgotten.
+
+One migration detail worth planning for: reminder state needs a *count* as well as a timestamp.
+If you add backoff later, read the old shape too, or every tracked condition re-fires once on
+upgrade — which is a bad first impression for a change whose entire purpose is sending less.
 
 ### Where the backend runs
 

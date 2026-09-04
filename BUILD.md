@@ -108,6 +108,12 @@ another local session.
 **Every hook fails open** — wrap the body, log to stderr, exit zero. Verify this deliberately by
 introducing an error and confirming sessions still work normally.
 
+**Also test the things that bite later:** rename a session and confirm a handoff naming its OLD
+name still resolves (ARCHITECTURE §2 — in our CLI the tab label *is* the address). Post a handoff
+to the wrong target, then try to retract it: confirm your reply reaches the *recipient*, not
+yourself (§4). Address a handoff to a specific session and confirm the other tabs are told it is
+not theirs.
+
 **Test:** session A posts a handoff; session B's next prompt carries it; B's *following* prompt
 does not (the cursor works). Session A claims a file; B's attempt to write it warns. B writes an
 absolute path into a *different* repo that A has claimed — that must warn too.
@@ -124,8 +130,15 @@ Parts 2 and 3, it needs no infrastructure, and in practice it's the feature peop
 
 **It must not message a peer for status, and must not do the work** — see ARCHITECTURE §3.
 
+Then let it watch: a daemon over the same reads, notifying on a session stuck at a permission
+prompt and on handoffs going stale. **One notification per cycle regardless of how many fired,
+and back the reminders off exponentially** (§8) — a flat cooldown sent us 125 reminders for one
+item.
+
 **Test:** with several sessions open, one command answers "what's going on?" completely enough
-that you don't open the other tabs to check. Then confirm no peer's transcript grew while it ran.
+that you don't open the other tabs to check. Then leave the daemon running with two conditions
+open and confirm you get ONE notification, and that the second reminder is further away than the
+first. Then confirm no peer's transcript grew while it ran.
 
 ## Part 4 — The shared call sheet (two developers)
 
